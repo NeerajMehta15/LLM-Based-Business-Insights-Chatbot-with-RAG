@@ -1,5 +1,6 @@
 import logging
 import os
+from src.config import Config
 
 def setup_logging():
     """Configure logging for the application"""

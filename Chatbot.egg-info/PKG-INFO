@@ -1,0 +1,17 @@
+Metadata-Version: 2.2
+Name: Chatbot
+Version: 0.0.1
+Author: Neeraj Mehta
+Author-email: Neerajmehta15@hotmail.com
+Requires-Dist: langchain>=0.1.0
+Requires-Dist: langchain-community
+Requires-Dist: chromadb
+Requires-Dist: transformers
+Requires-Dist: sentence-transformers
+Requires-Dist: huggingface-hub
+Requires-Dist: streamlit
+Requires-Dist: pypdf
+Requires-Dist: python-dotenv
+Dynamic: author
+Dynamic: author-email
+Dynamic: requires-dist
