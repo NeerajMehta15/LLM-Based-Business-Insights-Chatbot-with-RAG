@@ -6,4 +6,3 @@ huggingface-hub
 streamlit
 pypdf
 python-dotenv
--e .
