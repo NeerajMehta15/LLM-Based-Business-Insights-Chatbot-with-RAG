@@ -4,6 +4,7 @@ Version: 0.0.1
 Author: Krish Naik
 Author-email: krishnaik06@gmail.com
 Requires-Dist: langchain
+Requires-Dist: langchain-community
 Requires-Dist: chromadb
 Requires-Dist: transformers
 Requires-Dist: sentence-transformers

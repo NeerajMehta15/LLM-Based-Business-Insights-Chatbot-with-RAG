@@ -5,3 +5,8 @@ SamplePRoject.egg-info/SOURCES.txt
 SamplePRoject.egg-info/dependency_links.txt
 SamplePRoject.egg-info/requires.txt
 SamplePRoject.egg-info/top_level.txt
+src/__init__.py
+src/chatbot.py
+src/config.py
+src/utils.py
+tests/test_chatbot.py
