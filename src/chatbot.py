@@ -1,12 +1,13 @@
+# src/chatbot.py
 from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
-from langchain_community.llms import HuggingFaceHub
+from langchain.memory import ConversationBufferWindowMemory
+from langchain_huggingface import HuggingFaceEndpoint
 import logging
-from config import Config 
+from src.config import Config
 
 class BusinessInsightsChatbot:
     def __init__(self):
@@ -49,16 +50,17 @@ class BusinessInsightsChatbot:
                 embedding=embeddings,
                 persist_directory=Config.CHROMA_DIR
             )
-            self.vector_store.persist()
-            self.logger.info("Vector store created and persisted")
+            # Removed persist() call as it's no longer needed
+            self.logger.info("Vector store created")
         except Exception as e:
             self.logger.error(f"Error creating vector store: {str(e)}")
             raise
 
     def initialize_llm(self):
         """Initialize HuggingFace model"""
-        return HuggingFaceHub(
+        return HuggingFaceEndpoint(
             repo_id=Config.MODEL_REPO_ID,
+            task="text-generation",
             model_kwargs={
                 "temperature": Config.TEMPERATURE,
                 "max_length": Config.MAX_LENGTH,
@@ -70,9 +72,10 @@ class BusinessInsightsChatbot:
     def setup_conversation_chain(self):
         """Set up the conversational chain"""
         try:
-            memory = ConversationBufferMemory(
+            memory = ConversationBufferWindowMemory(
                 memory_key="chat_history",
-                return_messages=True
+                return_messages=True,
+                k=5  # Keep last 5 exchanges
             )
             
             llm = self.initialize_llm()
@@ -96,7 +99,8 @@ class BusinessInsightsChatbot:
             if not self.conversation_chain:
                 raise ValueError("Conversation chain not initialized")
                 
-            response = self.conversation_chain({"question": query})
+            # Using invoke instead of __call__
+            response = self.conversation_chain.invoke({"question": query})
             return {
                 'answer': response['answer'],
                 'sources': [doc.metadata for doc in response['source_documents']]

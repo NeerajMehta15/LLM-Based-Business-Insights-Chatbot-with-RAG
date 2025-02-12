@@ -4,11 +4,12 @@ Version: 0.0.1
 Author: Neeraj Mehta
 Author-email: Neerajmehta15@hotmail.com
 Requires-Dist: langchain>=0.1.0
-Requires-Dist: langchain-community
-Requires-Dist: chromadb
+Requires-Dist: langchain-community>=0.0.10
+Requires-Dist: langchain-huggingface>=0.0.6
+Requires-Dist: chromadb>=0.4.0
 Requires-Dist: transformers
 Requires-Dist: sentence-transformers
-Requires-Dist: huggingface-hub
+Requires-Dist: huggingface-hub>=0.19.0
 Requires-Dist: streamlit
 Requires-Dist: pypdf
 Requires-Dist: python-dotenv

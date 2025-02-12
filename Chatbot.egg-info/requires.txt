@@ -1,9 +1,10 @@
 langchain>=0.1.0
-langchain-community
-chromadb
+langchain-community>=0.0.10
+langchain-huggingface>=0.0.6
+chromadb>=0.4.0
 transformers
 sentence-transformers
-huggingface-hub
+huggingface-hub>=0.19.0
 streamlit
 pypdf
 python-dotenv
