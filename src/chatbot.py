@@ -1,11 +1,10 @@
-# src/chatbot.py
 from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings 
 from langchain_community.vectorstores import Chroma
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
-from langchain_huggingface import HuggingFaceEndpoint
+from langchain_community.llms import HuggingFaceHub
 import logging
 from src.config import Config
 
@@ -50,7 +49,6 @@ class BusinessInsightsChatbot:
                 embedding=embeddings,
                 persist_directory=Config.CHROMA_DIR
             )
-            # Removed persist() call as it's no longer needed
             self.logger.info("Vector store created")
         except Exception as e:
             self.logger.error(f"Error creating vector store: {str(e)}")
@@ -58,9 +56,8 @@ class BusinessInsightsChatbot:
 
     def initialize_llm(self):
         """Initialize HuggingFace model"""
-        return HuggingFaceEndpoint(
+        return HuggingFaceHub(
             repo_id=Config.MODEL_REPO_ID,
-            task="text-generation",
             model_kwargs={
                 "temperature": Config.TEMPERATURE,
                 "max_length": Config.MAX_LENGTH,
@@ -74,8 +71,9 @@ class BusinessInsightsChatbot:
         try:
             memory = ConversationBufferWindowMemory(
                 memory_key="chat_history",
+                output_key="answer", 
                 return_messages=True,
-                k=5  # Keep last 5 exchanges
+                k=5
             )
             
             llm = self.initialize_llm()
@@ -86,7 +84,8 @@ class BusinessInsightsChatbot:
                     search_kwargs={"k": Config.RETRIEVER_K}
                 ),
                 memory=memory,
-                return_source_documents=True
+                return_source_documents=True,
+                combine_docs_chain_kwargs={"output_key": "answer"}
             )
             self.logger.info("Conversation chain setup complete")
         except Exception as e:
@@ -99,12 +98,17 @@ class BusinessInsightsChatbot:
             if not self.conversation_chain:
                 raise ValueError("Conversation chain not initialized")
                 
-            # Using invoke instead of __call__
             response = self.conversation_chain.invoke({"question": query})
-            return {
-                'answer': response['answer'],
-                'sources': [doc.metadata for doc in response['source_documents']]
+            
+            # Extract and format the response
+            formatted_response = {
+                'answer': response.get('answer', ''),
+                'sources': [doc.metadata for doc in response.get('source_documents', [])]
             }
+            
+            self.logger.info("Query processed successfully")
+            return formatted_response
+            
         except Exception as e:
             self.logger.error(f"Error processing query: {str(e)}")
             raise
